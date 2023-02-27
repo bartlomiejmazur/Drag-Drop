@@ -62,8 +62,24 @@ class ProjectState extends State<Project> {
       ProjectStatus.Active
     );
     this.projects.push(newProject);
+    this.updateListeners();
+
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
+    }
+  }
+
+  moveProject(projectId: string, newStatus: ProjectStatus) {
+    const project = this.projects.find((prj) => prj.id === projectId);
+    if (project && project.status !== newStatus) {
+      project.status = newStatus;
+      this.updateListeners();
+    }
+  }
+
+  private updateListeners() {
+    for (const listenersFn of this.listeners) {
+      listenersFn(this.projects.slice());
     }
   }
 }
@@ -195,9 +211,7 @@ class ProjectItems
     event.dataTransfer!.effectAllowed = "move";
   }
 
-  dragEndHandler(_: DragEvent) {
-    console.log("DragEnd");
-  }
+  dragEndHandler(_: DragEvent) {}
 
   configure() {
     this.element.addEventListener("dragstart", this.dragStartHandler);
@@ -235,9 +249,13 @@ class ProjectList
       listEl.classList.add("droppable");
     }
   }
-
+  @autobind
   dropHandler(event: DragEvent) {
-    console.log(event.dataTransfer!.getData("text/plain"));
+    const prjId = event.dataTransfer!.getData("text/plain");
+    projectState.moveProject(
+      prjId,
+      this.type === "active" ? ProjectStatus.Active : ProjectStatus.Finished
+    );
   }
 
   @autobind
@@ -355,7 +373,7 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     if (Array.isArray(userInput)) {
       const [title, desc, people] = userInput;
       projectState.addProject(title, desc, people);
-      console.log(title, desc, people);
+
       this.clearInputs();
     }
   }
