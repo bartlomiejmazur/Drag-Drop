@@ -25,7 +25,8 @@ input,
 textarea {
   font: inherit;
   padding: 0.2rem 0.4rem;
-  width: 100%;
+  width: 70vw;
+  /* width: 100%; */
   max-width: 30rem;
   border: 1px solid #ccc;
 }
@@ -121,6 +122,11 @@ button:active {
 }
 
 #user-input {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
   margin: 1rem;
   padding: 1rem;
   border: 1px solid #ff0062;
